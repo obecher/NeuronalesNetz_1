@@ -1,0 +1,45 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="using:NeuralNetworks_1"
+        mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="600"
+        x:Class="NeuralNetworks_1.MainWindow"
+        Title="MainWindow" Height="600" Width="1000">
+    <Grid ColumnDefinitions="*,Auto" Margin="10">
+        <DataGrid x:Name="networkDataGrid" Grid.Column="0" x:DataType="local:nodeRow"
+                  AutoGenerateColumns="False" IsReadOnly="True"
+                  GridLinesVisibility="All" BorderThickness="1">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="InputLayer" Binding="{Binding inputValue}"/>
+                <DataGridTextColumn Header="WeightsI-H" Binding="{Binding weightsIH}"/>
+                <DataGridTextColumn Header="InputHidden" Binding="{Binding inputHidden}"/>
+                <DataGridTextColumn Header="OutputHidden" Binding="{Binding outputHidden}"/>
+                <DataGridTextColumn Header="WeightsH-O" Binding="{Binding weightsHO}"/>
+                <DataGridTextColumn Header="ErrorHidden" Binding="{Binding errorHidden}"/>
+                <DataGridTextColumn Header="InputOutput" Binding="{Binding inputOutput}"/>
+                <DataGridTextColumn Header="OutputLayer" Binding="{Binding outputLayer}"/>
+                <DataGridTextColumn Header="Target" Binding="{Binding target}"/>
+                <DataGridTextColumn Header="ErrorOutput" Binding="{Binding errorOutput}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <StackPanel Grid.Column="1" Width="160" Margin="15,10,0,0" Spacing="4">
+            <Label Content="Just click on:"/>
+            <Label Content="CreateButton -&gt; QueryButton" Margin="0,0,0,40"/>
+
+            <Label Content="Learning Rate"/>
+            <TextBox Text="TextBox"/>
+            <Label Content="Input Nodes"/>
+            <TextBox x:Name="inputTextBox" Text="3"/>
+            <Label Content="Hidden Nodes"/>
+            <TextBox x:Name="hiddenTextBox" Text="3"/>
+            <Label Content="Output Nodes"/>
+            <TextBox x:Name="outputTextBox" Text="3" Margin="0,0,0,40"/>
+
+            <Button x:Name="createButton" Content="CreateButton" HorizontalAlignment="Stretch" Click="createButton_Click"/>
+            <Button x:Name="trainButton" Content="TrainButton" HorizontalAlignment="Stretch"/>
+            <Button x:Name="queryButton" Content="QueryButton" HorizontalAlignment="Stretch" Click="queryButton_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>
