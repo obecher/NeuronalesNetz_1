@@ -90,3 +90,4 @@ C:\Users\ollib\Downloads\NeuralNetworks-1_S\NeuralNetworks-1_S\obj\Debug\net10.0
 C:\Users\ollib\Downloads\NeuralNetworks-1_S\NeuralNetworks-1_S\obj\Debug\net10.0\NeuralNetworks-1.pdb
 C:\Users\ollib\Downloads\NeuralNetworks-1_S\NeuralNetworks-1_S\obj\Debug\net10.0\NeuralNetworks-1.genruntimeconfig.cache
 C:\Users\ollib\Downloads\NeuralNetworks-1_S\NeuralNetworks-1_S\obj\Debug\net10.0\ref\NeuralNetworks-1.dll
+C:\Users\ollib\Downloads\NeuralNetworks-1_S\NeuralNetworks-1_S\obj\Debug\net10.0\NeuralNetworks-1.sourcelink.json

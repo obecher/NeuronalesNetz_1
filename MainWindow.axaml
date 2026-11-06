@@ -38,7 +38,7 @@
             <TextBox x:Name="outputTextBox" Text="3" Margin="0,0,0,40"/>
 
             <Button x:Name="createButton" Content="CreateButton" HorizontalAlignment="Stretch" Click="createButton_Click"/>
-            <Button x:Name="trainButton" Content="TrainButton" HorizontalAlignment="Stretch"/>
+            <Button Name="trainButton" Content="TrainButton" Click="trainButton_Click" />
             <Button x:Name="queryButton" Content="QueryButton" HorizontalAlignment="Stretch" Click="queryButton_Click"/>
         </StackPanel>
     </Grid>

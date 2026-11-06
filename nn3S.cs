@@ -15,6 +15,10 @@ namespace NeuralNetworks_1
         double[] hidden_outputs;
         double[] final_inputs;
         double[] final_outputs;
+        double[] hidden_errors;
+double[] output_errors;
+double learningRate;
+nnMath nnMathO = new nnMath();
 
         public double[,] WIH { get { return wih; } }
         public double[,] WHO { get { return who; } }
@@ -22,15 +26,18 @@ namespace NeuralNetworks_1
         public double[] Hidden_outputs { get { return hidden_outputs; } }
         public double[] Final_inputs { get { return final_inputs; } }
         public double[] Final_outputs { get { return final_outputs; } }
+        public double[] Hidden_errors { get { return hidden_errors; } }
+public double[] Output_errors { get { return output_errors; } }
         
-        public nn3S(int inodes, int hnodes, int onodes)
-        {
-            this.inodes = inodes;
-            this.hnodes = hnodes;
-            this.onodes = onodes;
+public nn3S(int inodes, int hnodes, int onodes, double learningRate)
+{
+    this.inodes = inodes;
+    this.hnodes = hnodes;
+    this.onodes = onodes;
+    this.learningRate = learningRate;
 
-            createWeightMatrizes();
-        }
+    createWeightMatrizes();
+}
 
         private void createWeightMatrizes()
         {
@@ -76,6 +83,44 @@ namespace NeuralNetworks_1
             final_outputs = nnMathO.activationFunction(final_inputs);
            
         }
+        public void train(double[] inputs, double[] targets)
+        {
+            queryNN(inputs);
+
+            output_errors = nnMathO.vectorSub(targets, final_outputs);
+            double [,] who_transposed = nnMathO.transpose(who);
+            hidden_errors = nnMathO.matrixMult(who_transposed, onodes, output_errors);
+            double[] gradient_output = new double[onodes];
+    for (int i = 0; i < onodes; i++)
+    {
+        gradient_output[i] = output_errors[i] * final_outputs[i] * (1.0 - final_outputs[i]);
     }
+
+    // Äußeres Produkt bilden (multipliziert mit den Ausgaben der vorherigen Schicht)
+    double[,] delta_who = nnMathO.fullMatrixMult(gradient_output, hidden_outputs);
+    // Mit der Lernrate skalieren
+    double[,] delta_who_scaled = nnMathO.matrixScale(delta_who, learningRate);
+    // Zur bestehenden Matrix addieren
+    who = nnMathO.matrixSum(who, delta_who_scaled);
+
+    // 5. Gewichte zwischen Eingabeschicht und versteckter Schicht anpassen (WIH)
+    // Formel: += learningRate * [(hidden_errors * hidden_outputs * (1.0 - hidden_outputs)) * (inputs)T]
+    
+    // Gradient für die versteckte Schicht berechnen
+    double[] gradient_hidden = new double[hnodes];
+    for (int i = 0; i < hnodes; i++)
+    {
+        gradient_hidden[i] = hidden_errors[i] * hidden_outputs[i] * (1.0 - hidden_outputs[i]);
+    }
+
+    // Äußeres Produkt bilden
+    double[,] delta_wih = nnMathO.fullMatrixMult(gradient_hidden, inputs);
+    // Mit der Lernrate skalieren
+    double[,] delta_wih_scaled = nnMathO.matrixScale(delta_wih, learningRate);
+    // Zur bestehenden Matrix addieren
+    wih = nnMathO.matrixSum(wih, delta_wih_scaled);
+        }
+    }
+    
 }
 
