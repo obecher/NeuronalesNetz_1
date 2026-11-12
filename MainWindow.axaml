@@ -3,9 +3,9 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="using:NeuralNetworks_1"
-        mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="600"
+        mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="760"
         x:Class="NeuralNetworks_1.MainWindow"
-        Title="MainWindow" Height="600" Width="1000">
+        Title="Neural Networks - nn3S" Height="760" Width="1200">
     <Grid ColumnDefinitions="*,Auto" Margin="10">
         <DataGrid x:Name="networkDataGrid" Grid.Column="0" x:DataType="local:nodeRow"
                   AutoGenerateColumns="False" IsReadOnly="True"
@@ -24,22 +24,54 @@
             </DataGrid.Columns>
         </DataGrid>
 
-        <StackPanel Grid.Column="1" Width="160" Margin="15,10,0,0" Spacing="4">
-            <Label Content="Just click on:"/>
-            <Label Content="CreateButton -&gt; QueryButton" Margin="0,0,0,40"/>
+        <ScrollViewer Grid.Column="1" Margin="15,0,0,0">
+            <StackPanel x:Name="controlPanel" Width="230" Spacing="4">
 
-            <Label Content="Learning Rate"/>
-            <TextBox Text="TextBox"/>
-            <Label Content="Input Nodes"/>
-            <TextBox x:Name="inputTextBox" Text="3"/>
-            <Label Content="Hidden Nodes"/>
-            <TextBox x:Name="hiddenTextBox" Text="3"/>
-            <Label Content="Output Nodes"/>
-            <TextBox x:Name="outputTextBox" Text="3" Margin="0,0,0,40"/>
+                <!-- Hyperparameter -->
+                <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto">
+                    <Label Grid.Row="0" Grid.Column="0" Content="Input Nodes" VerticalAlignment="Center"/>
+                    <TextBox Grid.Row="0" Grid.Column="1" x:Name="inputTextBox" Text="784"/>
+                    <Label Grid.Row="1" Grid.Column="0" Content="Hidden Nodes" VerticalAlignment="Center"/>
+                    <TextBox Grid.Row="1" Grid.Column="1" x:Name="hiddenTextBox" Text="100"/>
+                    <Label Grid.Row="2" Grid.Column="0" Content="Output Nodes" VerticalAlignment="Center"/>
+                    <TextBox Grid.Row="2" Grid.Column="1" x:Name="outputTextBox" Text="10"/>
+                    <Label Grid.Row="3" Grid.Column="0" Content="Learning Rate" VerticalAlignment="Center"/>
+                    <TextBox Grid.Row="3" Grid.Column="1" x:Name="learningRateTextBox" Text="0.1"/>
+                    <Label Grid.Row="4" Grid.Column="0" Content="Epochs" VerticalAlignment="Center"/>
+                    <TextBox Grid.Row="4" Grid.Column="1" x:Name="epochenBox" Text="1"/>
+                </Grid>
 
-            <Button x:Name="createButton" Content="CreateButton" HorizontalAlignment="Stretch" Click="createButton_Click"/>
-            <Button Name="trainButton" Content="TrainButton" Click="trainButton_Click" />
-            <Button x:Name="queryButton" Content="QueryButton" HorizontalAlignment="Stretch" Click="queryButton_Click"/>
-        </StackPanel>
+                <Button x:Name="createButton" Content="Create Network" HorizontalAlignment="Stretch" Click="createButton_Click"/>
+                <Button x:Name="loadWeightButton" Content="Load Weights..." HorizontalAlignment="Stretch" Click="loadWeightButton_Click"/>
+
+                <Separator Margin="0,6"/>
+                <Button x:Name="openTrainButton" Content="Open Train File..." HorizontalAlignment="Stretch" Click="openTrainButton_Click"/>
+                <TextBlock x:Name="trainFileText" Text="(no train file)" FontSize="11" TextWrapping="Wrap"/>
+                <Button x:Name="trainButton" Content="Train" HorizontalAlignment="Stretch" Click="trainButton_Click"/>
+
+                <Separator Margin="0,6"/>
+                <Button x:Name="openTestButton" Content="Open Test File..." HorizontalAlignment="Stretch" Click="openTestButton_Click"/>
+                <TextBlock x:Name="testFileText" Text="(no test file)" FontSize="11" TextWrapping="Wrap"/>
+                <Button x:Name="queryButton" Content="Query" HorizontalAlignment="Stretch" Click="queryButton_Click"/>
+
+                <Separator Margin="0,6"/>
+                <CheckBox x:Name="showImagesCheckBox" Content="ShowImages"/>
+                <Border BorderBrush="Gray" BorderThickness="1" Width="140" Height="140" HorizontalAlignment="Center">
+                    <Image x:Name="digitImage" Width="140" Height="140" Stretch="Fill"
+                           RenderOptions.BitmapInterpolationMode="None"/>
+                </Border>
+
+                <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto" Margin="0,6,0,0">
+                    <Label Grid.Row="0" Grid.Column="0" Content="Label" VerticalAlignment="Center"/>
+                    <TextBox Grid.Row="0" Grid.Column="1" x:Name="labelBox" IsReadOnly="True"/>
+                    <Label Grid.Row="1" Grid.Column="0" Content="Recognized" VerticalAlignment="Center"/>
+                    <TextBox Grid.Row="1" Grid.Column="1" x:Name="recognizedBox" IsReadOnly="True"/>
+                    <Label Grid.Row="2" Grid.Column="0" Content="Performance" VerticalAlignment="Center"/>
+                    <TextBox Grid.Row="2" Grid.Column="1" x:Name="performanceBox" IsReadOnly="True"/>
+                </Grid>
+
+                <TextBlock x:Name="statusText" Text="Ready." TextWrapping="Wrap" FontSize="11" Margin="0,6,0,0"/>
+            </StackPanel>
+        </ScrollViewer>
     </Grid>
 </Window>

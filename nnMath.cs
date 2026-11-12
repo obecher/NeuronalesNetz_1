@@ -9,14 +9,21 @@ namespace NeuralNetworks_1;
 
 class nnMath
 {
+    // mat1 hat die Form [von, nach] (z.B. wih[inodes, hnodes]), mat2 ist der Vektor der "von"-Schicht.
+    // Ergebnis hat die Länge der "nach"-Schicht: result[j] = Summe_i mat1[i,j] * mat2[i]
+    // FIX Labor 3: vorher war result so lang wie mat2 -> klappt nur bei 3x3 (quadratisch)
     public double[] matrixMult(double[,] mat1, int mat1width, double[] mat2)
     {
+        int rows = mat1.GetLength(0);   // muss == mat2.Length sein
+        int cols = mat1.GetLength(1);   // Länge des Ergebnisses
+        double[] result = new double[cols];
 
-        double[] result = new double[mat2.Length];
-        for (int j = 0; j < result.Length; j++ )
-        for (int i = 0; i < mat2.Length; i++)
-        result[j] += mat1[i,j] * mat2[i];
-
+        for (int i = 0; i < rows; i++)
+        {
+            double x = mat2[i];
+            for (int j = 0; j < cols; j++)
+                result[j] += mat1[i, j] * x;
+        }
         return result;
     }
     public double[] activationFunction(double[] inputs)
@@ -28,6 +35,8 @@ class nnMath
         return result;
     }
 
+    // Äußeres Produkt: result[i,j] = vec1[i] * vec2[j]  -> Form [vec1.Length, vec2.Length]
+    // Für ein Delta zu w[von, nach] also: fullMatrixMult(prevOutputs, gradient)
     public double[,] fullMatrixMult(double[] vec1, double[] vec2)
     {
         double [,] result = new double[vec1.Length, vec2.Length];

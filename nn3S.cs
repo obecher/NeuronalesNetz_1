@@ -1,12 +1,11 @@
 #nullable disable
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NeuralNetworks_1
 {
+    // 3-Schichten-Netz (Input - Hidden - Output)
+    // Konvention der Gewichtsmatrizen: [von-Knoten, nach-Knoten]
+    //   wih[inodes, hnodes]   who[hnodes, onodes]
     class nn3S
     {
         double[,] wih, who;
@@ -16,9 +15,9 @@ namespace NeuralNetworks_1
         double[] final_inputs;
         double[] final_outputs;
         double[] hidden_errors;
-double[] output_errors;
-double learningRate;
-nnMath nnMathO = new nnMath();
+        double[] output_errors;
+        double learningRate;
+        nnMath nnMathO = new nnMath();
 
         public double[,] WIH { get { return wih; } }
         public double[,] WHO { get { return who; } }
@@ -27,100 +26,98 @@ nnMath nnMathO = new nnMath();
         public double[] Final_inputs { get { return final_inputs; } }
         public double[] Final_outputs { get { return final_outputs; } }
         public double[] Hidden_errors { get { return hidden_errors; } }
-public double[] Output_errors { get { return output_errors; } }
-        
-public nn3S(int inodes, int hnodes, int onodes, double learningRate)
-{
-    this.inodes = inodes;
-    this.hnodes = hnodes;
-    this.onodes = onodes;
-    this.learningRate = learningRate;
+        public double[] Output_errors { get { return output_errors; } }
+        public double LearningRate { get { return learningRate; } set { learningRate = value; } }
 
-    createWeightMatrizes();
-}
+        public nn3S(int inodes, int hnodes, int onodes, double learningRate)
+        {
+            this.inodes = inodes;
+            this.hnodes = hnodes;
+            this.onodes = onodes;
+            this.learningRate = learningRate;
 
+            createWeightMatrizes();
+        }
+
+        // Startgewichte: Zufallszahlen gleichverteilt zwischen -1.0 und +1.0
         private void createWeightMatrizes()
         {
             wih = new double[inodes, hnodes];
             who = new double[hnodes, onodes];
+            Random rnd = new Random();
 
-            wih[0, 0] = 0.9; //spalte, reihe
-            wih[1, 0] = 0.3;
-            wih[2, 0] = 0.4;
-            wih[0, 1] = 0.2;
-            wih[1, 1] = 0.8;
-            wih[2, 1] = 0.2;
-            wih[0, 2] = 0.1;
-            wih[1, 2] = 0.5;
-            wih[2, 2] = 0.6;
+            for (int i = 0; i < inodes; i++)
+                for (int j = 0; j < hnodes; j++)
+                    wih[i, j] = rnd.NextDouble() * 2.0 - 1.0;   // [0,1) -> [-1,1)
 
-            who[0, 0] = 0.3;
-            who[1, 0] = 0.7;
-            who[2, 0] = 0.5;
-            who[0, 1] = 0.6;
-            who[1, 1] = 0.5;
-            who[2, 1] = 0.2;
-            who[0, 2] = 0.8;
-            who[1, 2] = 0.1;
-            who[2, 2] = 0.9;
+            for (int i = 0; i < hnodes; i++)
+                for (int j = 0; j < onodes; j++)
+                    who[i, j] = rnd.NextDouble() * 2.0 - 1.0;
+        }
+
+        // Zum Laden trainierter Gewichte von der Festplatte
+        public void setWIHMatrix(double[,] matrix)
+        {
+            if (matrix.GetLength(0) != inodes || matrix.GetLength(1) != hnodes)
+                throw new ArgumentException("WIH hat die falsche Größe");
+            wih = matrix;
+        }
+
+        public void setWHOMatrix(double[,] matrix)
+        {
+            if (matrix.GetLength(0) != hnodes || matrix.GetLength(1) != onodes)
+                throw new ArgumentException("WHO hat die falsche Größe");
+            who = matrix;
         }
 
         public void queryNN(double[] inputs)
         {
-            nnMath nnMathO = new nnMath();
-
-            hidden_inputs = new double[hnodes];
             hidden_inputs = nnMathO.matrixMult(wih, inodes, inputs);
-           
-            hidden_outputs = new double[hnodes];
             hidden_outputs = nnMathO.activationFunction(hidden_inputs);
-           
-
-            final_inputs = new double[onodes];
-           final_inputs = nnMathO.matrixMult(who, hnodes, hidden_outputs);
 
             final_inputs = nnMathO.matrixMult(who, hnodes, hidden_outputs);
             final_outputs = nnMathO.activationFunction(final_inputs);
-           
         }
+
         public void train(double[] inputs, double[] targets)
         {
+            // 1. Vorwärts rechnen
             queryNN(inputs);
 
+            // 2. Fehler am Ausgang: e = target - output
             output_errors = nnMathO.vectorSub(targets, final_outputs);
-            double [,] who_transposed = nnMathO.transpose(who);
+
+            // 3. Fehler zurück in die versteckte Schicht verteilen: e_hidden = WHO * e_out
+            //    (who ist [hnodes, onodes]; transponiert [onodes, hnodes] -> Ergebnis Länge hnodes)
+            double[,] who_transposed = nnMathO.transpose(who);
             hidden_errors = nnMathO.matrixMult(who_transposed, onodes, output_errors);
-            double[] gradient_output = new double[onodes];
-    for (int i = 0; i < onodes; i++)
-    {
-        gradient_output[i] = output_errors[i] * final_outputs[i] * (1.0 - final_outputs[i]);
-    }
 
-    // Äußeres Produkt bilden (multipliziert mit den Ausgaben der vorherigen Schicht)
-    double[,] delta_who = nnMathO.fullMatrixMult(gradient_output, hidden_outputs);
-    // Mit der Lernrate skalieren
-    double[,] delta_who_scaled = nnMathO.matrixScale(delta_who, learningRate);
-    // Zur bestehenden Matrix addieren
-    who = nnMathO.matrixSum(who, delta_who_scaled);
+            // 4. Gewichte anpassen (erst WHO, dann WIH)
+            //    WICHTIG: hidden_errors wurden oben mit dem ALTEN who berechnet - so ist es richtig.
+            updateWeights(who, output_errors, final_outputs, hidden_outputs);
+            updateWeights(wih, hidden_errors, hidden_outputs, inputs);
+        }
 
-    // 5. Gewichte zwischen Eingabeschicht und versteckter Schicht anpassen (WIH)
-    // Formel: += learningRate * [(hidden_errors * hidden_outputs * (1.0 - hidden_outputs)) * (inputs)T]
-    
-    // Gradient für die versteckte Schicht berechnen
-    double[] gradient_hidden = new double[hnodes];
-    for (int i = 0; i < hnodes; i++)
-    {
-        gradient_hidden[i] = hidden_errors[i] * hidden_outputs[i] * (1.0 - hidden_outputs[i]);
-    }
+        // Gradientenabstieg für eine Gewichtsmatrix w[von, nach]:
+        //   w[i,j] += learningRate * (e_j * o_j * (1 - o_j)) * prev_i
+        // e = Fehler der "nach"-Schicht, o = Ausgaben der "nach"-Schicht, prev = Ausgaben der "von"-Schicht
+        // Entspricht: w += lr * fullMatrixMult(prev, e*o*(1-o)), aber direkt in der Matrix
+        // (ohne 3 neue 784x100-Matrizen pro Bild -> beim 60K-Training deutlich schneller)
+        private void updateWeights(double[,] w, double[] errors, double[] outputs, double[] prevOutputs)
+        {
+            int rows = w.GetLength(0);
+            int cols = w.GetLength(1);
 
-    // Äußeres Produkt bilden
-    double[,] delta_wih = nnMathO.fullMatrixMult(gradient_hidden, inputs);
-    // Mit der Lernrate skalieren
-    double[,] delta_wih_scaled = nnMathO.matrixScale(delta_wih, learningRate);
-    // Zur bestehenden Matrix addieren
-    wih = nnMathO.matrixSum(wih, delta_wih_scaled);
+            double[] gradient = new double[cols];
+            for (int j = 0; j < cols; j++)
+                gradient[j] = learningRate * errors[j] * outputs[j] * (1.0 - outputs[j]);
+
+            for (int i = 0; i < rows; i++)
+            {
+                double p = prevOutputs[i];
+                for (int j = 0; j < cols; j++)
+                    w[i, j] += gradient[j] * p;
+            }
         }
     }
-    
 }
-
